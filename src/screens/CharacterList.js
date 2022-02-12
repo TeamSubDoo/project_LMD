@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { FlatList } from 'react-native';
 import styled, { ThemeContext } from 'styled-components';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -50,7 +50,6 @@ for( let idx = 0 ; idx< 1000 ; idx++) {
 const Item = React.memo(
   ({ item: { id, name, description, createdAt }, onPress }) => {
   const theme = useContext(ThemeContext);
-  console.log(`Item: ${id}`);
 
   return (
     <ItemContainer onPress={() => onPress({ id, name })}>

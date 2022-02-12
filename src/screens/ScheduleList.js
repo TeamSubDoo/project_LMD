@@ -1,8 +1,12 @@
-import React, { useContext } from 'react';
-import { FlatList, View } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { Alert, FlatList, View } from 'react-native';
 import styled, { ThemeContext } from 'styled-components';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Button } from '../components';
+import { getFirestore, collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import config from '../../firebase.json'
+
 
 const Container = styled.View`
   flex: 1;
@@ -49,14 +53,13 @@ for( let idx = 0 ; idx< 10 ; idx++) {
 }
 
 const Item = React.memo(
-  ({ item: { id, name, description, createdAt }, onPress, onMatching }) => {
+  ({ item: { id, title, description, createdAt }, onPress, onMatching }) => {
   const theme = useContext(ThemeContext);
-  console.log(`Item: ${id}`);
 
   return (
-    <ItemContainer onPress={() => onPress({ id, name })}>
+    <ItemContainer onPress={() => onPress({ id, title })}>
       <ItemTextContainer>
-        <ItemTitle>{name}</ItemTitle>
+        <ItemTitle>{title}</ItemTitle>
         <ItemDescription>{description}</ItemDescription>
       </ItemTextContainer>
       <View>
@@ -71,6 +74,23 @@ const Item = React.memo(
 );
 
 const ScheduleList = ({navigation}) => {
+  const [channels, setChannels] = useState([]);
+
+  const app = initializeApp(config);
+
+  const DB = getFirestore(app);
+
+  useEffect(async () => {
+    const q = query(collection(DB, 'channels'), orderBy("createdAt", "desc"));
+    const snapshot = await getDocs(q);
+    const list =[]
+    snapshot.forEach(doc => {
+      console.log(doc.data());
+      list.push(doc.data());
+    });
+    setChannels(list);
+  }, []);
+
   const _handleItemPress = params => {
     navigation.navigate('Channel', params);
   };
@@ -79,16 +99,18 @@ const ScheduleList = ({navigation}) => {
     navigation.navigate('Channel', params);
   };
 
+  
   return (
     <Container>
       <FlatList
-        keyExtractor={item => item['id'].toString()}
-        data={schedules}
+        keyExtractor={item => item['id']}
+        data={channels}
         renderItem={({ item }) => (
           <Item item={item} onPress={_handleItemPress} onMatching={_handleMatching} />
         )}
         windowSize={3}
       />
+      <Button title="채널 추가하기" onPress={() => {navigation.navigate('Channel Creation')}}/>
     </Container>
   )
 }

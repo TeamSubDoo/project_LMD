@@ -1,6 +1,6 @@
 import {initializeApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut }  from 'firebase/auth';
-import { getFirestore, collection, setDoc, addDoc } from 'firebase/firestore'
+import { getFirestore, collection, setDoc, addDoc, getDoc } from 'firebase/firestore'
 import config from '../../firebase.json'
 
 /**
@@ -34,11 +34,19 @@ export const getCurrentUser = () => {
 export const DB = getFirestore(app);
 
 export const createChannel = async ({ title, description }) => {
-  const newChannelRef = addDoc(collection(DB, "users"), {
+  const newChannelRef = await addDoc(collection(DB, "channels"), {
     title,
     description,
     createdAt: Date.now()
   });
   return newChannelRef.id;
+}
+
+export const createMessage = async ({ channelId, text }) => {
+  const doc = await getDoc(collection(DB, 'channels', channelId));
+  return await setDoc(doc, {
+    text,
+    createdAt: Date.now()
+  });
 }
 

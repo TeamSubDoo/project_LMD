@@ -20,12 +20,14 @@ const cacheImages = images => {
     }
   });
 };
+
 //폰트 캐쉬
 const cacheFonts = fonts => {
   return fonts.map(font => Font.loadAsync(font));
 };
 
 const App = () => {
+
   const [isReady, setIsReady] = useState(false);
 
   const _loadAssets = async () => {

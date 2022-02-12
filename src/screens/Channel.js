@@ -1,8 +1,13 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useLayoutEffect, useState } from 'react';
 import styled, { ThemeContext } from 'styled-components/native';
 import { GiftedChat, Send } from 'react-native-gifted-chat';
 import { MaterialIcons } from '@expo/vector-icons';
-import { getCurrentUser } from '../utils/firebase';
+import { getCurrentUser, createMessage } from '../utils/firebase';
+import { initializeApp } from 'firebase/app';
+import config from '../../firebase.json'
+import { collection, getFirestore, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { FlatList, Text } from 'react-native';
+import { Input } from '../components';
 
 const Container = styled.View`
   flex:1;
@@ -35,16 +40,34 @@ const SendButton = props => {
   )
 }
 
-const Channel = ({ route }) => {
+const Channel = ({ navigation, route: { params } }) => {
   const theme = useContext(ThemeContext);
   const { uid, name, photoUrl } = getCurrentUser();
-  const {messages, setMessages} = useState([]);
-
+  const [ messages, setMessages ] = useState([]);
+  const [text, setText] = useState('');
   const _handleMessageSend = () => {};
-  
+
+  // useEffect(() => {
+  //   const app = initializeApp(config);
+  //   const DB = getFirestore(app);
+  //   const q = query(collection(DB, 'channels'), orderBy('createdAt', 'desc'));
+  //   onSnapshot(q, qs => {
+  //     const list = [];
+  //     qs.forEach(doc => {
+  //       list.push(doc.data());
+  //     });
+  //     setMessages(list);
+  //   })
+  // }, []);
+  // useLayoutEffect(() => {
+  //   console.log(params.title)
+  //   navigation.setOptions({ headerTitle: params.title || 'Channel'});
+  // }, []);
+
+
   return (
     <Container>
-      <GiftedChat
+      {/* <GiftedChat
         listViewProps={{
           style: { backgroundColor: theme.background },
         }}
@@ -63,7 +86,17 @@ const Channel = ({ route }) => {
         renderUsernameOnMessage={true}
         scrollToBottom={true}
         renderSend={props => <SendButton {...props}/>}
+        /> */}
+      <FlatList
+        keyExtractor={item => item['id']}
+        data={messages}
+        renderItem={({item}) => (
+          <Text style={{ fontSize: 24}}>{item.text}</Text>
+        )}
         />
+        {/* <Input value={text}
+          onChangeText={text => setText(text)}
+          onSubmitEditing={() => createMessage({ channelId: params.id, text})}/> */}
     </Container>
   );
 };

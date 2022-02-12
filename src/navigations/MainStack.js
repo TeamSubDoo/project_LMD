@@ -19,7 +19,11 @@ const MainStack = () => {
         headerBackTitleVisible: false,
       }}>
         <Stack.Screen name="Main" component={CharacterList} />
-        <Stack.Screen name="ScheduleList" component={ ScheduleList } />
+        <Stack.Screen name="ScheduleList" component={ ScheduleList } 
+          options={{
+            headerTitle: '채팅리스트'
+          }}
+        />
         <Stack.Screen name="Channel Creation" component={ChannelCreation} />
         <Stack.Screen name="Channel" component={Channel} />
       </Stack.Navigator>
